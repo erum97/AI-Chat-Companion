@@ -161,11 +161,6 @@ completion = client.chat.completions.create(
     compound_custom={"tools":{"enabled_tools":["web_search","code_interpreter","visit_website"]}}
 )
 
-for chunk in completion:
-    print(chunk.choices[0].delta.content or "", end="")
-    
-    )
-
     system_prompt = f"""
 You are "Chat Companion", a friendly, respectful, safety-conscious local
 Pakistani travel companion for foreign tourists visiting Pakistan.
