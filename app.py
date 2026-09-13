@@ -142,17 +142,28 @@ def get_groq_client():
 
 def generate_answer(question, chat_history, retrieved_chunks):
     """Send the user's question + retrieved RAG context to Groq."""
+from groq import Groq
 
-    client = get_groq_client()
-    if client is None:
-        return (
-            "The Groq API key has not been added yet. "
-            "Please add GROQ_API_KEY in Streamlit Community Cloud → "
-            "your app → Settings → Secrets."
-        )
+client = Groq()
+completion = client.chat.completions.create(
+    model="groq/compound-mini",
+    messages=[
+      {
+        "role": "user",
+        "content": ""
+      }
+    ],
+    temperature=1,
+    max_completion_tokens=2048,
+    top_p=1,
+    stream=True,
+    stop=None,
+    compound_custom={"tools":{"enabled_tools":["web_search","code_interpreter","visit_website"]}}
+)
 
-    context = "\n\n".join(
-        f"[{chunk['title']}]\n{chunk['text']}" for chunk in retrieved_chunks
+for chunk in completion:
+    print(chunk.choices[0].delta.content or "", end="")
+    
     )
 
     system_prompt = f"""
