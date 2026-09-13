@@ -134,34 +134,29 @@ def retrieve_context(question, top_k=4):
 # 4. GROQ
 # ---------------------------------------------------------
 def get_groq_client():
-    """Read the Groq API key from Streamlit Secrets."""
-    if "GROQ_API_KEY" not in st.secrets:
+    """Read the Groq API key safely from Streamlit Secrets."""
+    if "GROQ_API_KEY" not in st.secrets or not st.secrets["GROQ_API_KEY"]:
         return None
     return Groq(api_key=st.secrets["GROQ_API_KEY"])
 
 
 def generate_answer(question, chat_history, retrieved_chunks):
-    """Send the user's question + retrieved RAG context to Groq."""
-from groq import Groq
+    """Send the user's question + retrieved RAG context to Groq using groq/compound-mini."""
+    client = get_groq_client()
 
-client = Groq()
-completion = client.chat.completions.create(
-    model="groq/compound-mini",
-    messages=[
-      {
-        "role": "user",
-        "content": ""
-      }
-    ],
-    temperature=1,
-    max_completion_tokens=2048,
-    top_p=1,
-    stream=True,
-    stop=None,
-    compound_custom={"tools":{"enabled_tools":["web_search","code_interpreter","visit_website"]}}
-)
+    if client is None:
+        return (
+            "⚠️ The Groq API key has not been added yet. "
+            "Please add `GROQ_API_KEY` in Streamlit Community Cloud → App Settings → Secrets."
+        )
 
-system_prompt = f"""
+    # Format retrieved context
+    if retrieved_chunks:
+        context = "\n\n".join([f"- {chunk['title']}: {chunk['text']}" for chunk in retrieved_chunks])
+    else:
+        context = "No specific context available from the knowledge base."
+
+    system_prompt = f"""
 You are "Chat Companion", a friendly, respectful, safety-conscious local
 Pakistani travel companion for foreign tourists visiting Pakistan.
 
@@ -204,10 +199,12 @@ RETRIEVED KNOWLEDGE:
 
     try:
         response = client.chat.completions.create(
-            model=st.secrets.get("GROQ_MODEL", "llama-3.1-8b-instant"),
+            model="groq/compound-mini",
             messages=messages,
-            temperature=0.2,
-            max_tokens=700,
+            temperature=1,
+            max_completion_tokens=2048,
+            top_p=1,
+            compound_custom={"tools": {"enabled_tools": ["web_search", "code_interpreter", "visit_website"]}},
         )
         return response.choices[0].message.content
     except Exception as error:
