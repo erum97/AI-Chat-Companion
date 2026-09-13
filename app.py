@@ -9,7 +9,7 @@ from sklearn.metrics.pairwise import cosine_similarity
 # ---------------------------------------------------------
 st.set_page_config(
     page_title="Chat Companion | Pakistan Travel",
-    page_icon="🇵🇰",
+    page_icon="AI",
     layout="centered",
 )
 
@@ -215,7 +215,7 @@ RETRIEVED KNOWLEDGE:
 # ---------------------------------------------------------
 # 5. USER INTERFACE
 # ---------------------------------------------------------
-st.title("🇵🇰 Chat Companion")
+st.title("AI Chat Companion")
 st.caption("A practical AI travel companion for foreign tourists visiting Pakistan.")
 
 with st.sidebar:
