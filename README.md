@@ -1,4 +1,4 @@
-# 🇵🇰 Chat Companion — Pakistan Travel RAG App
+# AI Chat Companion — Pakistan Travel App
 
 A beginner-friendly Streamlit application that acts as an AI travel companion for foreign tourists visiting Pakistan.
 
